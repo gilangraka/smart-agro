@@ -3,15 +3,11 @@
 namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\IndexRequest;
 use App\Http\Requests\PostCategory\StorePostCategoryRequest;
 use App\Http\Requests\PostCategory\UpdatePostCategoryRequest;
 use App\Models\MPostCategory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
-use function PHPUnit\Framework\isNull;
 
 class PostCategoryController extends BaseController
 {
@@ -26,7 +22,7 @@ class PostCategoryController extends BaseController
 
             $data = MPostCategory::select(['id', 'name', 'slug'])
                 ->when(
-                    !isNull($search),
+                    !is_null($search),
                     fn($q) => $q->where('name', 'like', "%$search%")
                 )
                 ->orderBy($orderBy, $orderDirection)
@@ -73,10 +69,10 @@ class PostCategoryController extends BaseController
     public function update(UpdatePostCategoryRequest $request, $id)
     {
         try {
+            $params = $request->validated();
             $data = MPostCategory::find($id);
             if (!$data) return $this->sendError('Post category not found!');
 
-            $params = $request->validated();
             if ($params['name'] != $data['name']) {
                 $slug = Str::slug($params['name']);
                 $count = MPostCategory::where('slug', $slug)->count();
