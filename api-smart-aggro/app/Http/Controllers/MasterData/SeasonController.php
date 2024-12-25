@@ -18,9 +18,9 @@ class SeasonController extends Controller
 
             if (!$season) {
                 return response()->json(['error' => 'Season not found'], 404);
+            } else {
+                return response()->json($season, 200);
             }
-
-            return response()->json($season);
 
         } catch (\Exception $e) {
             return response()->json(['error' => 'Season not found', 'message' => $e->getMessage()], 404);
@@ -32,7 +32,11 @@ class SeasonController extends Controller
         try{
             $seasons = Season::all();
 
-            return response()->json($seasons);
+            if ($seasons->isEmpty()) {
+                return response()->json(['error' => 'Seasons not found'], 404);
+            } else {
+                return response()->json($seasons, 200);
+            }
 
         } catch (\Exception $e) {
             return response()->json(['error' => 'Seasons not found', 'message' => $e->getMessage()], 404);
@@ -46,9 +50,9 @@ class SeasonController extends Controller
 
             if (!$season) {
                 return response()->json(['error' => 'Season not found'], 404);
+            } else {
+                return response()->json($season, 200);
             }
-
-            return response()->json($season);
 
         } catch (\Exception $e) {
             return response()->json(['error' => 'Season not found', 'message' => $e->getMessage()], 404);
@@ -68,13 +72,18 @@ class SeasonController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $season = Season::create([
-                'name' => $request->name,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
-            ]);
+            if (Season::where('name', $request->name)->exists()) {
+                return response()->json(['error' => 'Season already exists'], 409);
+            } else{
+                $season = Season::create([
+                    'name' => $request->name,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                ]);
 
-            return response()->json($season, 201);
+                return response()->json($season, 201);
+            }
+
         } catch (\Exception $e) {
             return response()->json(['error' => 'Season creation failed', 'message' => $e->getMessage()], 500);
         }
@@ -91,18 +100,19 @@ class SeasonController extends Controller
 
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
+            } else {
+                $season = Season::find($id);
+
+                if (!$season) {
+                    return response()->json(['error' => 'Season not found'], 404);
+                } else {
+                    $season->name = $request->name;
+                    $season->start_date = $request->start_date;
+                    $season->end_date = $request->end_date;
+                    $season->save();
+                }
+
             }
-
-            $season = Season::find($id);
-
-            if (!$season) {
-                return response()->json(['error' => 'Season not found'], 404);
-            }
-
-            $season->name = $request->name;
-            $season->start_date = $request->start_date;
-            $season->end_date = $request->end_date;
-            $season->save();
 
             return response()->json($season, 200);
         } catch (\Exception $e) {
@@ -117,11 +127,11 @@ class SeasonController extends Controller
 
             if (!$season) {
                 return response()->json(['error' => 'Season not found'], 404);
+            } else {
+                $season->delete();
+
+                return response()->json(['message' => 'Season deleted'], 200);
             }
-
-            $season->delete();
-
-            return response()->json(['message' => 'Season deleted'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Season deletion failed', 'message' => $e->getMessage()], 500);
         }

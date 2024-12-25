@@ -36,11 +36,12 @@ Route::group(['prefix' => 'master'], function ($route) {
     $route->get('season/current', [SeasonController::class, 'current_season']);
     $route->apiResource('season', SeasonController::class);
 
-    $route->apiResource('plant-recommendations', PlantRecommendationsController::class)->only(['index', 'create', 'update']);
+    $route->apiResource('plant-recommendations', PlantRecommendationsController::class);
 });
 
 Route::apiResource('post', PostController::class)->only(['index', 'show']);
 Route::apiResource('post', PostController::class)->except(['index', 'show'])->middleware('auth:sanctum');
 Route::post('post/comment', [PostController::class, 'comment'])->middleware('auth:sanctum');
 
+Route::apiResource('plant-recommendations', PlantRecommendationsController::class)->except(['store', 'update', 'destroy']);
 

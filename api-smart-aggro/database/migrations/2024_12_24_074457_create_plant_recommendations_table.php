@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('plant_recommendations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('season_id');
+            $table->foreignId('season_id')->constrained('m_seasons')->onDelete('cascade');
             $table->string('name');
             $table->string('imageUrl');
-            $table->foreignId('season_id')->constrained('seasons')->cascadeOnDelete();
             $table->timestamps();
         });
     }
